@@ -1,1 +1,2 @@
-# cs-251
+# CS251 LABS & PROJECTS
+
