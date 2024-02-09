@@ -154,8 +154,8 @@ class Data:
 
                     if item_idx in num_cat_idx_cols:
                         if item:
-                            tmp_item: str = item.strip()
-                            cur += float(tmp_item) if data_types[item_idx] == "numeric" else int(tmp_item)
+                            tmp_item = float(item.strip()) if data_types[item_idx] == "numeric" else int(tmp_item.strip())
+                            cur.append(tmp_item)
 
                 data.append(cur)
 
