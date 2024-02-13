@@ -131,33 +131,55 @@ class Data:
         '''
         
         self.filepath: str = filepath
-        self.data: List[List[int]]
+        self.data: List[List[float]]
 
         with open(filepath, 'r') as data_file:
-            
-            contents: List[str] = data_file.readlines()
 
-            headers: List[str] = contents[0].split(',')
+            headers: List[str] = data_file.readline().split(',')
             self.headers = [header.strip() for header in headers]
+
+            types = data_file.readline().split(',')
+            types = [type_i.strip() for type_i in types]
+
             self.header2col = {self.headers[header_idx]: header_idx for header_idx in range(len(self.headers))}
 
-            data_types: List[str] = contents[1].split(',')
-            num_cat_idx_cols: Set[int] = {idx_col for idx_col in range(len(data_types)) if data_types[idx_col] in {"numeric", "categorical"}}
+            numeric_idx: List[int] = [idx for idx in self.header2col.values() if types[idx] == "numeric"]
+            cat_idx: List[int] = [idx for idx in self.header2col.values() if types[idx] == "categorical"]
+            # unsupported_idx: List[int] = [idx for idx in self.header2col.values() if types[idx] != "numeric" and types[idx] != "categorical"]
 
             data: List[List[int]] = []
-            for row in contents[2:]:
-                inner_data_list: List[str] = row.split(",")
+            self.cats2levels: Dict[str, List[str]] = {}
+            for i in range(len(self.headers)):
+                if types[i] == 'categorical':
+                    self.cats2levels[self.headers[i]] = []
 
-                cur: List[str] = []
+            for line in data_file:
+                inner_data_list: List[str] = line.strip().split(',')
+                inner_data_list = [data.strip() for data in inner_data_list]
+
+                cur: List[int | float] = []
                 for item_idx in range(len(inner_data_list)):
                     item: str = inner_data_list[item_idx]
 
-                    if item_idx in num_cat_idx_cols:
-                        if item:
-                            tmp_item = float(item.strip()) if data_types[item_idx] == "numeric" else int(tmp_item.strip())
-                            cur.append(tmp_item)
+                    if not item:
+                        if item_idx in numeric_idx:
+                            item = np.nan
+                        else:
+                            item = "Missing"    
+
+                    if item_idx in numeric_idx:
+                        cur.append(float(item))
+                    elif item_idx in cat_idx:
+                        # do to cat level
+                        if item not in self.cats2levels[self.headers[item_idx]]:
+                            self.cats2levels[self.headers[item_idx]].append(item)
+                        item = self.cats2levels[self.headers[item_idx]].index(item)
+                        cur.append(item)
 
                 data.append(cur)
+
+        self.headers: List[str] = [self.headers[head_idx] for head_idx in range(len(self.headers)) if head_idx in numeric_idx or head_idx in cat_idx]
+        self.header2col = {self.headers[header_idx]: header_idx for header_idx in range(len(self.headers))}
 
         self.data = data
         self.data = np.array(self.data) # Representing self.data as a numpy array
