@@ -55,7 +55,7 @@ class Data:
         
         self.filepath: str = filepath
         self.headers: List[str]  = headers
-        self.data = data
+        self.data: np.ndarray = data
         self.header2col: Dict[str, int] = header2col
         self.cats2levels = cats2levels
 
@@ -130,9 +130,6 @@ class Data:
         - Make use of code from Lab 1a!
         '''
         
-        self.filepath: str = filepath
-        self.data: List[List[float]]
-
         with open(filepath, 'r') as data_file:
 
             headers: List[str] = data_file.readline().split(',')
@@ -201,7 +198,31 @@ class Data:
         NOTE: It is fine to print out int-coded categorical variables (no extra work compared to printing out numeric data).
         Printing out the categorical variables with string levels would be a small extension.
         '''
-        pass
+        
+        output_string: str = ""
+        str_init: str = "-------------------------------\n"
+
+        output_string += str_init
+        dim = self.data.shape
+        no_of_row, no_of_col = dim
+        output_string += f"{self.filepath} ({no_of_row}x{no_of_col})\nHeaders:\n"
+
+        header_line: str = ""
+        for header in self.headers:
+            header_line += f"{header}\t"
+        header_line += f"\n {str_init}"
+
+        output_string += header_line
+        output_string += f"Showing first (5/{no_of_row} rows.\n"
+
+        for row in self.data[:5, :]:
+            for digit in row:
+                output_string += f"{digit}\t"
+            output_string += "\n"
+        
+        output_string += str_init
+
+        return output_string
 
     def get_headers(self):
         '''Get list of header names (all variables)
@@ -210,7 +231,8 @@ class Data:
         -----------
         Python list of str.
         '''
-        pass
+
+        return self.headers
 
     def get_mappings(self):
         '''Get method for mapping between variable name and column index
@@ -219,7 +241,8 @@ class Data:
         -----------
         Python dictionary. str -> int
         '''
-        pass
+        
+        return self.header2col
 
     def get_cat_level_mappings(self):
         '''Get method for mapping between categorical variable names and a list of the respective unique level strings.
@@ -228,7 +251,8 @@ class Data:
         -----------
         Python dictionary. str -> list of str
         '''
-        pass
+        
+        return self.cats2levels
 
     def get_num_dims(self):
         '''Get method for number of dimensions in each data sample
@@ -237,7 +261,9 @@ class Data:
         -----------
         int. Number of dimensions in each data sample. Same thing as number of variables.
         '''
-        pass
+        
+        _, col =  self.data.shape
+        return col
 
     def get_num_samples(self):
         '''Get method for number of data points (samples) in the dataset
@@ -246,7 +272,9 @@ class Data:
         -----------
         int. Number of data samples in dataset.
         '''
-        pass
+        
+        row, _ = self.data.shape
+        return row
 
     def get_sample(self, rowInd):
         '''Gets the data sample at index `rowInd` (the `rowInd`-th sample)
@@ -255,7 +283,8 @@ class Data:
         -----------
         ndarray. shape=(num_vars,) The data sample at index `rowInd`
         '''
-        pass
+        
+        return self.data[rowInd, :]
 
     def get_header_indices(self, headers):
         '''Gets the variable (column) indices of the str variable names in `headers`.
@@ -268,7 +297,8 @@ class Data:
         -----------
         Python list of nonnegative ints. shape=len(headers). The indices of the headers in `headers` list.
         '''
-        pass
+        
+        return [idx for idx in range(len(self.headers)) if self.headers[idx] in headers] 
 
     def get_all_data(self):
         '''Gets a copy of the entire dataset
