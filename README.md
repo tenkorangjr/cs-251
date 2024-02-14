@@ -1,2 +1,2 @@
-# CS251 LABS & PROJECTS
+# CS251 Lectures, Labs & Projects
 
