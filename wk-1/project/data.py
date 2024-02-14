@@ -142,7 +142,6 @@ class Data:
 
             numeric_idx: List[int] = [idx for idx in self.header2col.values() if types[idx] == "numeric"]
             cat_idx: List[int] = [idx for idx in self.header2col.values() if types[idx] == "categorical"]
-            # unsupported_idx: List[int] = [idx for idx in self.header2col.values() if types[idx] != "numeric" and types[idx] != "categorical"]
 
             data: List[List[int]] = []
             self.cats2levels: Dict[str, List[str]] = {}
@@ -262,8 +261,7 @@ class Data:
         int. Number of dimensions in each data sample. Same thing as number of variables.
         '''
         
-        _, col =  self.data.shape
-        return col
+        return self.data.shape[1]
 
     def get_num_samples(self):
         '''Get method for number of data points (samples) in the dataset
@@ -273,8 +271,7 @@ class Data:
         int. Number of data samples in dataset.
         '''
         
-        row, _ = self.data.shape
-        return row
+        return self.data.shape[0]
 
     def get_sample(self, rowInd):
         '''Gets the data sample at index `rowInd` (the `rowInd`-th sample)
