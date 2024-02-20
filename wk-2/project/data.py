@@ -372,7 +372,7 @@ class Data:
 
         col_idx = [self.header2col.get(header) for header in headers]
 
-        if not rows:
+        if len(rows) == 0:
             return self.data[:, col_idx]
         
         return self.data[np.ix_(rows, col_idx)]
